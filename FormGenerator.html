@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Generate Form</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+var newform;
+var btnsubmit;
+var textfield
+var passwordfield;
+var radiobtn;
+var count=0;
+var divform;
+var jsonStr;
+function createForm(){
+
+if(count==1)
+{
+document.body.removeChild(divform);
+count=0;
+}
+count=1;
+divform=document.createElement("div");
+var formname = prompt("Please enter form name", "");
+var url = prompt("Please give the url to forward the result", "");
+
+
+
+newform=document.createElement("form");
+newform.name=formname;
+newform.id="myform";
+newform.action=url;
+btnsubmit= document.createElement("input");
+btnsubmit.type="submit";
+
+document.body.appendChild(newform);
+textfield=document.createElement("a");
+passwordfield=document.createElement("a");
+radiobtn=document.createElement("a");
+textfield.href="#";
+passwordfield.href="#";
+radiobtn.href="#";
+
+textfield.onclick=function(){
+ var textfieldname = prompt("Please enter field name", "");
+ var textfieldval = prompt("Enter maximum limit", "");
+ 
+ var mylabel= document.createElement("label");
+ mylabel.appendChild(document.createTextNode(textfieldname));
+ mylabel.name=textfieldname+"label";
+ var textname = document.createElement("input");
+ textname.type="text";
+ textname.name= textfieldname;
+ textname.maxLength=textfieldval;
+
+ newform.appendChild(mylabel);
+ newform.appendChild(textname);
+ }
+
+
+passwordfield.onclick=function(){
+ var passwordname = prompt("Please enter field name", "");
+ var passwordval = prompt("Enter Maximum Length", "");
+ 
+ var passlabel= document.createElement("label");
+ passlabel.appendChild(document.createTextNode(passwordname));
+ passlabel.name=passwordname+"label";
+ var passname = document.createElement("input");
+ passname.type="password";
+ passname.name= passwordname;
+ passname.maxLength=passwordval;
+ 
+ newform.appendChild(passlabel);
+ newform.appendChild(passname);
+ }
+
+radiobtn.onclick=function(){
+ var numname = prompt("Please enter field name", "");
+ var numval = prompt("Set maximum limit", "");
+ 
+ var numlabel= document.createElement("label");
+ numlabel.appendChild(document.createTextNode(numname));
+ numlabel.name=numname+"label";
+ var numname = document.createElement("input");
+ numname.type="number";
+ numname.name= numname;
+ numname.max=numval;
+ 
+ newform.appendChild(numlabel);
+ newform.appendChild(numname);
+ }
+
+btnsubmit.onclick=function(event) {
+event.preventDefault();
+var formElem = document.getElementsByName(newform.name);
+var k=0;
+var result=true;
+var empty=false;
+for(k=0; k<formElem.length; k++)
+{
+ if(formElem[k].type=="text" || formElem[k].type=="password" ){
+   if (formElem[k].value.length == 0 || formElem[k].value == "") {
+        alert(""+formElem[k].name+" should not be empty");
+        empty=true;
+    } 
+}
+  
+  if(formElem[k].type=="text")
+    {
+     result=/^[A-z ]+$/.test(formElem[k].value);
+    }
+}
+
+if(result==false)
+{
+ window.alert("Enter alphabets only");
+}
+
+if(result==true  && empty==false)
+{
+function getAttrs(DOMelement) {
+    var obj = {};
+    $.each(DOMelement.attributes, function () {
+        if (this.specified) {
+            obj[this.name] = this.value;
+        }
+    });
+    return obj;
+}
+
+$("form").each(function () {
+    var json = {
+        "form": []
+    };
+    $(this).find("input").each(function () {
+        json.form.push(getAttrs(this));
+    });
+    jsonStr = JSON.stringify(json);
+    console.log(jsonStr);
+});
+
+
+
+ updateLocalData(jsonStr);
+}
+}
+
+var updateLocalData = function(data){
+  localStorage.setItem('form', jsonStr);
+   getLocalData();
+}
+
+var buildform = function(formData){
+var newform1=document.createElement("form"); 
+  var j=0;
+
+  for(j=1; j<formData.form.length ; j++)
+{
+    var tag = document.createElement("input"); 
+    var taglabel= document.createElement("label");
+    taglabel.appendChild(document.createTextNode(formData.form[j].name));
+    taglabel.name=formData.form[j].name+"label";
+    console.log(formData.form[j].name);
+    console.log(formData.form[j].type);
+
+    tag.name=formData.form[j].name;
+    tag.type=formData.form[j].type;
+    if(formData.form[j].type=="text")
+      tag.maxLength=formData.form[j].maxlength;
+    if(formData.form[j].type=="number")
+      tag.max=formData.form[j].max;
+    if(formData.form[j].type=="password")
+     {
+      tag.maxLength=formData.form[j].maxlength;
+     }
+
+    newform1.appendChild(taglabel);
+    newform1.appendChild(tag);
+}
+ document.body.appendChild(newform1);
+}
+
+var getLocalData = function(){
+  var formData = JSON.parse(localStorage.getItem('form'));
+  if(formData !== null){
+     buildform(formData);
+   }
+
+
+
+
+
+
+
+}
+
+newform.appendChild(btnsubmit);
+textfield.appendChild(document.createTextNode("Create Text Field"));
+passwordfield.appendChild(document.createTextNode("Create Password Field"));
+radiobtn.appendChild(document.createTextNode("Create Number Field"));
+divform.appendChild(newform);
+divform.appendChild(textfield);
+divform.appendChild(passwordfield);
+divform.appendChild(radiobtn);
+document.body.appendChild(divform);
+
+}
+
+
+
+</script>
+</head>
+<body>
+<a href="#" onclick="createForm()">Create New Form</a>
+</body>
+</html>
